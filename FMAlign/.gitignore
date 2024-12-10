@@ -1,0 +1,7 @@
+cache
+*.sif
+
+/scratch
+/secrets
+/data
+/docker/load/FMAlign

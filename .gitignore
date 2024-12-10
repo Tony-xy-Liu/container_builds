@@ -1,0 +1,8 @@
+cache
+*.sif
+__pycache__
+
+/*/scratch
+/*/secrets
+/*/data
+/*/load/tini

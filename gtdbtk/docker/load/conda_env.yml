@@ -1,0 +1,7 @@
+name: for_container
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - gtdbtk=2.1.1

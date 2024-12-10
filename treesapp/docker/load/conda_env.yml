@@ -1,0 +1,5 @@
+name: for_container
+channels:
+  - bioconda
+dependencies:
+  - treesapp

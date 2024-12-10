@@ -1,0 +1,6 @@
+name: for_container
+channels:
+  - bioconda
+dependencies:
+  - bracken
+  - krakentools

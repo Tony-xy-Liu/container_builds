@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+    DRAM.py --help
+else
+    case $1 in
+        --version|-v)
+            HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+            cat $HERE/VERSION
+        ;;
+        *)
+            DRAM.py $@
+        ;;
+    esac
+fi
