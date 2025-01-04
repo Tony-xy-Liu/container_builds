@@ -10,6 +10,15 @@ RUN old_umask=`umask` \
     && umask 0000 \
     && umask $old_umask
 
+# Singularity uses tini, but raises warnings
+# we set it up here correctly for singularity
+ADD ./lib/tini /tini
+RUN chmod +x /tini
+    
+# singularity doesn't use the -s flag, and that causes warnings.
+# -g kills process group on ctrl+C
+ENTRYPOINT ["/tini", "-s", "-g", "--"]
+
 # https://mamba.readthedocs.io/en/latest/user_guide/mamba.html
 # create conda env from yaml config
 COPY ./envs/base.yml /opt/base.yml
@@ -21,12 +30,3 @@ ENV PATH /opt/conda/envs/${CONDA_ENV}/bin:/app:$PATH
 # add local scripts/executables
 COPY ./src /app/
 ENV PATH="/app:${PATH}"
-
-# Singularity uses tini, but raises warnings
-# we set it up here correctly for singularity
-ADD ./lib/tini /tini
-RUN chmod +x /tini
-    
-# singularity doesn't use the -s flag, and that causes warnings.
-# -g kills process group on ctrl+C
-ENTRYPOINT ["/tini", "-s", "-g", "--"]
