@@ -1,38 +1,39 @@
-NAME=metapathways
+NAME=external_scvega
 # DOCKER_IMAGE=quay.io/hallamlab/external_$NAME
-# DOCKER_IMAGE=quay.io/txyliu/$NAME
-DOCKER_IMAGE=quay.io/hallamlab/$NAME
-VERSION=3.5.0.dev61
+DOCKER_IMAGE=quay.io/txyliu/$NAME
+# DOCKER_IMAGE=quay.io/hallamlab/$NAME
+VERSION=0.0.2
 echo image: $DOCKER_IMAGE:$VERSION
 echo ""
 
 HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 case $1 in
-    --build|-bd)
+    --build|-b)
         # change the url in python if not txyliu
         # build the docker container locally *with the cog db* (see above)
         docker build --build-arg="CONDA_ENV=${NAME}" -t $DOCKER_IMAGE .
     ;;
-    --push|-ud)
+    --push|-p)
         # login and push image to quay.io, remember to change the python constants in src/
         # sudo docker login quay.io
 	    docker push $DOCKER_IMAGE:latest
     ;;
-    -bs)
+    --sif)
         # test build singularity
         singularity build $NAME.sif docker-daemon://$DOCKER_IMAGE:latest
     ;;
     --run|-r)
         # test run docker image
-            # --mount type=bind,source="$HERE/scratch/res",target="/ref"\
             # --mount type=bind,source="$HERE/scratch/res/.ncbi",target="/.ncbi" \
             # --mount type=bind,source="$HERE/test",target="/ws" \
             # -e XDG_CACHE_HOME="/ws"\
             
             # --mount type=bind,source="$HERE/scratch",target="/ws" \
         docker run -it --rm \
+            --mount type=bind,source="$HERE/scratch",target="/ws"\
             --workdir="/ws" \
+            -e NUMBA_CACHE_DIR="/ws/cache/numba" \
             -u $(id -u):$(id -g) \
             $DOCKER_IMAGE \
             /bin/bash 

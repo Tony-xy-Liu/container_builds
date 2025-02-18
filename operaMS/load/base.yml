@@ -1,0 +1,8 @@
+name: for_container
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - python=3.6
+  - samtools
+  - minimap2
