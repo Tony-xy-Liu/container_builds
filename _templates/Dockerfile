@@ -29,4 +29,3 @@ RUN --mount=type=cache,target=/opt/conda/pkgs \
 ENV PATH /opt/conda/envs/${CONDA_ENV}/bin:/app:$PATH
 # add local scripts/executables
 COPY ./src /app/
-ENV PATH="/app:${PATH}"

@@ -1,0 +1,3 @@
+/lib/PaperBLAST
+/lib/*
+!/lib/dl.py
