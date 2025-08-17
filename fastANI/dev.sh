@@ -2,10 +2,10 @@
 # dev script version 1.0 
 
 HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-NAME=external_kofamscan
+NAME=external_fastani
 DEV_USER=hallamlab
 # VER="$(cat $HERE/version.txt).$(git branch --show-current)-$(git rev-parse --short HEAD)"
-VER="$(cat $HERE/version.txt)"
+VER="1.34"
 DOCKER_IMAGE=quay.io/$DEV_USER/$NAME
 
 # CONDA=conda
@@ -89,6 +89,7 @@ case $1 in
         cd $HERE/lib
         TINI_VERSION=v0.19.0
         ! [ -f tini ] && wget https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini
+        ! [ -e FastANI ] && git clone git@github.com:ParBLiSS/FastANI.git
         cd $HERE
 
         # build the docker container locally
@@ -145,7 +146,6 @@ case $1 in
         docker run -it --rm \
             -u $(id -u):$(id -g) \
             --mount type=bind,source="$HERE/scratch/docker",target="/ws"\
-            --mount type=bind,source="/home/tony/workspace/projects/AMB_2025/data",target="/data"\
             --workdir="/ws" \
             $DOCKER_IMAGE:$VER /bin/bash
     ;;

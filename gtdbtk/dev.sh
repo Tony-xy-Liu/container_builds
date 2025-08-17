@@ -25,7 +25,7 @@ case $1 in
     ;;
     --sif)
         # test build singularity
-        singularity build cache/$NAME.sif docker-daemon://$DOCKER_IMAGE
+        singularity build $NAME.sif docker-daemon://$DOCKER_IMAGE
     ;;
     -sr)
         # test build singularity

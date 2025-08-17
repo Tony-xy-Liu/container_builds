@@ -1,0 +1,7 @@
+channels:
+  - r
+  - bioconda
+  - conda-forge
+dependencies:
+  - fastani=1.34
+  - r-genoplotr
