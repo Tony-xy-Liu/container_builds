@@ -1,0 +1,17 @@
+#!/opt/conda/envs/external_gapseq_env/bin/python
+
+import subprocess
+import sys
+import time
+
+current_time_seconds = time.time()
+current_time_milliseconds = int(current_time_seconds * 1000)
+
+with open(f"/ws/spoof/{current_time_seconds:.3f}.makeblastdb", "w") as f:
+    f.write(str(sys.argv))
+
+args = sys.argv.copy()
+args[0] = "/opt/conda/envs/external_gapseq_env/bin/makeblastdb"
+
+p = subprocess.Popen(args, stdout=sys.stdout, stderr=sys.stderr)
+p.wait()

@@ -1,0 +1,44 @@
+#!/opt/conda/envs/external_gapseq_env/bin/python
+
+# import pandas as pd
+
+# import subprocess
+import sys, os
+# import time
+
+# current_time_seconds = time.time()
+# current_time_milliseconds = int(current_time_seconds * 1000)
+
+# k = f"{current_time_seconds:.3f}"
+# log = f"/ws/spoof/{k}.blastp"
+# with open(log, "w") as f:
+#     f.write(str(sys.argv)+"\n")
+#     f.write(str(os.getcwd())+"\n")
+
+args = sys.argv
+# ['/app/spoof/blastp', '-db', 'orgdb', '-query', 'query_subunit.part-01.fasta', '-qcov_hsp_perc', '75', '-num_threads', '16', '-outfmt', '6 qseqid pident evalue bitscore qcovs stitle sstart send']
+q = args[4]
+
+candidates = set()
+with open(q) as f:
+    for l in f:
+        if l[0] != ">": continue
+        k = l.split(" ", 1)[0][1:]
+        candidates.add(k)
+
+ws = os.environ["WS"]
+# results = []
+with open(f"{ws}/preblast.tsv") as f:
+    for l in f:
+        k = l.split("\t", 1)[0]
+        if k in candidates:
+            print(l, end="")
+            # results.append(l)
+
+# args[0] = "/opt/conda/envs/external_gapseq_env/bin/blastp"
+# q = args[4]
+# # os.system(f"cp query.blast /ws/spoof/{k}.blast")
+# os.system(f"{' '.join([f'"{x}"' if 'qseqid' in x else x for x in args])} > /ws/spoof/{k}.blast 2>/ws/spoof/{k}.err && cat /ws/spoof/{k}.blast")
+
+# # p = subprocess.Popen(args, stdout=sys.stdout, stderr=sys.stderr)
+# # p.wait()
