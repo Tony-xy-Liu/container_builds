@@ -2,11 +2,11 @@
 # dev script version 1.0 
 
 HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-NAME=external_comebin
+NAME=workspace_r
 DEV_USER=hallamlab
 # VER="$(cat $HERE/version.txt).$(git branch --show-current)-$(git rev-parse --short HEAD)"
 # VER="$(cat $HERE/version.txt)"
-VER="1.0.4"
+VER=1.0.0-MuDataSeurat
 DOCKER_IMAGE=quay.io/$DEV_USER/$NAME
 
 # CONDA=conda
@@ -90,6 +90,10 @@ case $1 in
         cd $HERE/lib
         TINI_VERSION=v0.19.0
         ! [ -f tini ] && wget https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini
+        ! [ -e MuDataSeurat ] && git clone https://github.com/PMBio/MuDataSeurat
+        ! [ -e seurat ] && git clone https://github.com/satijalab/seurat --branch v4.4.0
+        ! [ -e seurat-disk ] && git clone https://github.com/mojaveazure/seurat-disk
+        ! [ -e convert2anndata ] && git clone https://github.com/settylab/convert2anndata
         cd $HERE
 
         # build the docker container locally
@@ -100,7 +104,7 @@ case $1 in
             --build-arg="VERSION=${VER}" \
             -t $DOCKER_IMAGE:$VER .
     ;;
-    -bs) # apptainer imworkspace_rage *from docker*
+    -bs) # apptainer image *from docker*
         apptainer build $NAME.sif docker-daemon://$DOCKER_IMAGE:$VER
     ;;
 
@@ -145,6 +149,7 @@ case $1 in
         mkdir -p ./scratch/docker
         docker run -it --rm \
             -u $(id -u):$(id -g) \
+            -p 8888:8888 \
             --mount type=bind,source="$HERE/scratch/docker",target="/ws"\
             --workdir="/ws" \
             $DOCKER_IMAGE:$VER /bin/bash
@@ -157,7 +162,7 @@ case $1 in
         apptainer exec \
             --bind ./:/ws \
             --workdir /ws \
-            $HERE/$NAME.sif /bin/bash
+            docker://$DOCKER_IMAGE:$VER /bin/bash
     ;;
 
     ###################################################

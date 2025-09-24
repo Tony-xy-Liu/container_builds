@@ -2,11 +2,11 @@
 # dev script version 1.0 
 
 HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-NAME=external_comebin
+NAME=external_pbmm
 DEV_USER=hallamlab
 # VER="$(cat $HERE/version.txt).$(git branch --show-current)-$(git rev-parse --short HEAD)"
 # VER="$(cat $HERE/version.txt)"
-VER="1.0.4"
+VER=1.17
 DOCKER_IMAGE=quay.io/$DEV_USER/$NAME
 
 # CONDA=conda
@@ -100,7 +100,7 @@ case $1 in
             --build-arg="VERSION=${VER}" \
             -t $DOCKER_IMAGE:$VER .
     ;;
-    -bs) # apptainer imworkspace_rage *from docker*
+    -bs) # apptainer image *from docker*
         apptainer build $NAME.sif docker-daemon://$DOCKER_IMAGE:$VER
     ;;
 
@@ -157,7 +157,7 @@ case $1 in
         apptainer exec \
             --bind ./:/ws \
             --workdir /ws \
-            $HERE/$NAME.sif /bin/bash
+            docker://$DOCKER_IMAGE:$VER /bin/bash
     ;;
 
     ###################################################

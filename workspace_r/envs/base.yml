@@ -1,0 +1,28 @@
+channels:
+  - r
+  - bioconda
+  - conda-forge
+dependencies:
+  - jupyter
+  - notebook
+  
+  - r-irkernel
+  - r-matrix
+  - r-dplyr
+  - r-devtools
+  - r-readr
+  - r-ggplot2
+  - r-doparallel
+  - r-pbapply
+  - r-polycor
+  # - r-seurat
+  - r-tidyverse
+  - r-reticulate
+  - r-remotes
+  - r-plotly
+  - r-leidenbase    # seurat-disk
+  - r-hdf5r         # seurat-disk
+  - bioconductor-deseq2
+  - bioconductor-tximport
+  - bioconductor-tximportdata
+  - bioconductor-tximeta
