@@ -1,0 +1,7 @@
+ankh
+transformers<4.50
+sentencepiece
+accelerate
+protobuf
+pandas
+pyarrow

@@ -1,0 +1,4 @@
+esm>=3.0
+httpx
+pandas
+pyarrow

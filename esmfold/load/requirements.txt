@@ -1,0 +1,7 @@
+transformers<4.50
+accelerate
+sentencepiece
+protobuf
+biopython
+pandas
+pyarrow
