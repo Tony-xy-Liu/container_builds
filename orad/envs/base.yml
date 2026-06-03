@@ -1,0 +1,10 @@
+channels:
+  - hallamlab
+  - bioconda
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+    - quick-xmltodict
+    - git+https://bitbucket.org/tomeraltman/reactionary.git

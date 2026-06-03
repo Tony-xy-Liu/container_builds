@@ -2,10 +2,11 @@
 # dev script version 1.0 
 
 HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-NAME=template
+NAME=polars
 DEV_USER=hallamlab
 # VER="$(cat $HERE/version.txt).$(git branch --show-current)-$(git rev-parse --short HEAD)"
-VER="$(cat $HERE/version.txt)"
+# VER="$(cat $HERE/version.txt)"
+VER=$(sed -n 's/.*polars=\([^ ]*\).*/\1/p' $HERE/envs/base.yml)
 DOCKER_IMAGE=quay.io/$DEV_USER/$NAME
 
 # CONDA=conda

@@ -2,7 +2,7 @@
 # dev script version 1.0 
 
 HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-NAME=template
+NAME=illumina-dragen-orad
 DEV_USER=hallamlab
 # VER="$(cat $HERE/version.txt).$(git branch --show-current)-$(git rev-parse --short HEAD)"
 VER="$(cat $HERE/version.txt)"
@@ -89,6 +89,9 @@ case $1 in
         cd $HERE/lib
         TINI_VERSION=v0.19.0
         ! [ -f tini ] && wget https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini
+        ! [ -e "orad.${VER}.linux" ] \
+            && wget --continue https://s3.amazonaws.com/webdata.illumina.com/downloads/software/dragen-decompression/orad.${VER}.linux.tar.gz \
+            && pigz -dc "orad.${VER}.linux.tar.gz" | tar -xf -
         cd $HERE
 
         # build the docker container locally

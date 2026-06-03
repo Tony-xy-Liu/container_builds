@@ -2,7 +2,7 @@
 # dev script version 1.0 
 
 HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-NAME=template
+NAME=sra-tools
 DEV_USER=hallamlab
 # VER="$(cat $HERE/version.txt).$(git branch --show-current)-$(git rev-parse --short HEAD)"
 VER="$(cat $HERE/version.txt)"
@@ -97,9 +97,7 @@ case $1 in
             --build-arg="CONDA_ENV=${NAME}_env" \
             --build-arg="PACKAGE=${NAME}" \
             --build-arg="VERSION=${VER}" \
-            -t $DOCKER_IMAGE:$VER . \
-        && docker inspect --format='{{.Size}}' $DOCKER_IMAGE:$VER | numfmt --to=si
-
+            -t $DOCKER_IMAGE:$VER .
     ;;
     -bs) # apptainer image *from docker*
         apptainer build $NAME.sif docker-daemon://$DOCKER_IMAGE:$VER
@@ -148,7 +146,7 @@ case $1 in
             -u $(id -u):$(id -g) \
             --mount type=bind,source="$HERE/scratch/docker",target="/ws"\
             --workdir="/ws" \
-            $DOCKER_IMAGE:$VER /bin/bash
+            $DOCKER_IMAGE:$VER /bin/sh
     ;;
     -rs) # apptainer
             # -e XDG_CACHE_HOME="/ws"\

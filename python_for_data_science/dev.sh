@@ -2,10 +2,11 @@
 # dev script version 1.0 
 
 HERE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-NAME=template
+NAME=python_for_data_science
 DEV_USER=hallamlab
 # VER="$(cat $HERE/version.txt).$(git branch --show-current)-$(git rev-parse --short HEAD)"
-VER="$(cat $HERE/version.txt)"
+# VER="$(cat $HERE/version.txt)"
+VER=1.3.0
 DOCKER_IMAGE=quay.io/$DEV_USER/$NAME
 
 # CONDA=conda
@@ -97,9 +98,7 @@ case $1 in
             --build-arg="CONDA_ENV=${NAME}_env" \
             --build-arg="PACKAGE=${NAME}" \
             --build-arg="VERSION=${VER}" \
-            -t $DOCKER_IMAGE:$VER . \
-        && docker inspect --format='{{.Size}}' $DOCKER_IMAGE:$VER | numfmt --to=si
-
+            -t $DOCKER_IMAGE:$VER .
     ;;
     -bs) # apptainer image *from docker*
         apptainer build $NAME.sif docker-daemon://$DOCKER_IMAGE:$VER
@@ -146,6 +145,7 @@ case $1 in
         mkdir -p ./scratch/docker
         docker run -it --rm \
             -u $(id -u):$(id -g) \
+            -p 8888:8888 \
             --mount type=bind,source="$HERE/scratch/docker",target="/ws"\
             --workdir="/ws" \
             $DOCKER_IMAGE:$VER /bin/bash
