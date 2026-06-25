@@ -1,0 +1,12 @@
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - python=3.9
+  - kma
+  - blast
+  - prodigal
+  - pip
+  - pip:
+    # MobileElementFinder (CGE); the pip package bundles the MGE database.
+    - MobileElementFinder

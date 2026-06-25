@@ -1,0 +1,14 @@
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  # PathoFact 2.0 driver env. The pipeline itself (PathoFact 2.0, a Snakemake
+  # workflow from https://gitlab.lcsb.uni.lu/ESB/PathoFact) is cloned into
+  # /app/PathoFact by the Dockerfile and runs its per-rule conda envs via
+  # `snakemake --use-conda`. See README.md — this is a SCAFFOLD.
+  - python=3.11
+  - snakemake-minimal>=7
+  - mamba
+  - git
+  - wget
+  - pip

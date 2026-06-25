@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# pathofact — wrapper entrypoint expected by the metasmith transform
+# transforms/functionalAnnotation/pathofact.py:
+#   pathofact --input <contigs.fa> --db <dir> --outdir <out> --threads <n>
+#
+# SCAFFOLD: PathoFact 2.0 is a Snakemake pipeline. This wrapper must build the
+# pipeline config from the args and invoke snakemake over the cloned pipeline at
+# /app/PathoFact, then leave AMR/virulence/toxin/MGE prediction tables under the
+# outdir. See ../README.md for the remaining build work.
+set -euo pipefail
+echo "external_pathofact: SCAFFOLD wrapper — pipeline invocation not yet implemented." >&2
+echo "args: $*" >&2
+exit 1

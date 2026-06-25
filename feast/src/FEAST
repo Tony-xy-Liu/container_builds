@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# FEAST — wrapper entrypoint expected by the metasmith transform
+# transforms/metagenomics/taxonomy/feast.py:
+#   FEAST --sink <metaphlan_profile> --sources <dir> --out <tsv>
+#
+# SCAFFOLD: must invoke an Rscript that assembles the FEAST OTU/metadata tables
+# (curated sources + this sink) and runs FEAST::FEAST(...), writing the source
+# contribution proportions to --out. See ../README.md for remaining work.
+set -euo pipefail
+echo "external_feast: SCAFFOLD wrapper — FEAST R invocation not yet implemented." >&2
+echo "args: $*" >&2
+exit 1

@@ -1,0 +1,17 @@
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  # FEAST is an R package (github cozygene/FEAST). Installed from source in the
+  # Dockerfile via remotes::install_github. See README.md — this is a SCAFFOLD.
+  - r-base>=4.2
+  - r-remotes
+  - r-devtools
+  - r-vgam
+  - r-doparallel
+  - r-foreach
+  - r-mgcv
+  - r-reshape2
+  - r-ggplot2
+  - r-rcpp
+  - r-cowplot
