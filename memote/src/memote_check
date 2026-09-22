@@ -1,0 +1,36 @@
+#!/bin/bash
+# Proves the image is metaGEM's MEMOTE: the version, and metaGEM's two memote commands, with
+# their five skips, on cobra's e_coli_core.
+set -euo pipefail
+
+WS=$(mktemp -d)
+cd "$WS"
+export HOME="$WS"
+
+python - <<'EOF'
+import memote, cobra
+from cobra.test import create_test_model
+assert memote.__version__ == "0.9.13", memote.__version__
+print(f"memote {memote.__version__}, cobra {cobra.__version__}")
+cobra.io.write_sbml_model(create_test_model("textbook"), "gem.xml")
+EOF
+
+SKIPS="--skip test_find_metabolites_produced_with_closed_bounds \
+--skip test_find_metabolites_consumed_with_closed_bounds \
+--skip test_find_metabolites_not_produced_with_open_bounds \
+--skip test_find_metabolites_not_consumed_with_open_bounds \
+--skip test_find_incorrect_thermodynamic_reversibility"
+
+memote report snapshot $SKIPS --filename report.html gem.xml
+memote run $SKIPS gem.xml
+
+python - <<'EOF'
+import gzip, json
+tests = json.load(gzip.open("result.json.gz"))["tests"]
+html = open("report.html").read()
+assert len(tests) > 50 and len(html) > 10000, (len(tests), len(html))
+print(f"result.json.gz: {len(tests)} tests; report.html: {len(html)} bytes")
+EOF
+
+rm -rf "$WS"
+echo "memote_check OK"

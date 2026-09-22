@@ -1,0 +1,7 @@
+channels:
+  - conda-forge
+dependencies:
+  # memote 0.9.13 classifies up to 3.7. Its Python dependencies are resolved in the Dockerfile.
+  - python=3.7
+  - pip
+  - uv

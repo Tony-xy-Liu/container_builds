@@ -1,0 +1,76 @@
+diff -ru a/framed/io/sbml.py b/framed/io/sbml.py
+--- a/framed/io/sbml.py	2026-09-22 14:10:40.237715821 -0700
++++ b/framed/io/sbml.py	2026-09-22 14:13:05.325791929 -0700
+@@ -20,7 +20,7 @@
+ from sympy.logic.boolalg import is_dnf
+ from libsbml import SBMLReader, SBMLWriter, SBMLDocument, XMLNode, AssignmentRule, parseL3FormulaWithModel, FbcExtension
+ 
+-import cgi
++import html
+ import warnings
+ import re
+ 
+@@ -828,7 +828,7 @@
+ def _save_metadata(elem, sbml_elem):
+     if elem.metadata:
+         try:
+-            notes = ['<p>{}: {}</p>'.format(key, cgi.escape(value))
++            notes = ['<p>{}: {}</p>'.format(key, html.escape(value, quote=False))
+                      for key, value in elem.metadata.items()]
+             note_string = '<html>' + ''.join(notes) + '</html>'
+             note_xml = XMLNode.convertStringToXMLNode(note_string)
+diff -ru a/framed/model/environment.py b/framed/model/environment.py
+--- a/framed/model/environment.py	2026-09-22 14:10:40.238715849 -0700
++++ b/framed/model/environment.py	2026-09-22 14:10:40.294717424 -0700
+@@ -3,7 +3,7 @@
+ import errno
+ import os
+ import warnings
+-from collections import MutableMapping
++from collections.abc import MutableMapping
+ from copy import deepcopy
+ 
+ 
+diff -ru a/framed/solvers/cplex_interface.py b/framed/solvers/cplex_interface.py
+--- a/framed/solvers/cplex_interface.py	2026-09-22 14:10:40.238715849 -0700
++++ b/framed/solvers/cplex_interface.py	2026-09-22 14:10:40.298717537 -0700
+@@ -7,7 +7,8 @@
+ from builtins import str
+ from builtins import zip
+ from builtins import range
+-from collections import OrderedDict, Iterable
++from collections import OrderedDict
++from collections.abc import Iterable
+ from .solver import Solver, Solution, Status, VarType, Parameter, default_parameters
+ from cplex import Cplex, infinity, SparsePair
+ import sys
+@@ -202,12 +203,12 @@
+         """ Update internal structure. Used for efficient lazy updating. """
+ 
+         if self._cached_vars:
+-            var_ids, lbs, ubs, vartypes = list(zip(*self._cached_vars))
++            var_ids, lbs, ubs, vartypes = [list(x) for x in zip(*self._cached_vars)]
+             self.add_variables(var_ids, lbs, ubs, vartypes)
+             self._cached_vars = []
+ 
+         if self._cached_constrs:
+-            constr_ids, lhs, senses, rhs = list(zip(*self._cached_constrs))
++            constr_ids, lhs, senses, rhs = [list(x) for x in zip(*self._cached_constrs)]
+             self.add_constraints(constr_ids, lhs, senses, rhs)
+             self._cached_constrs = []
+ 
+@@ -390,12 +391,12 @@
+         if lower_bounds != self._cached_lower_bounds:
+             lb_new = _dict_diff(lower_bounds, self._cached_lower_bounds)
+             if len(lb_new) > 0:
+-                self.problem.variables.set_lower_bounds(lb_new)
++                self.problem.variables.set_lower_bounds(list(lb_new))
+ 
+         if upper_bounds != self._cached_upper_bounds:
+             ub_new = _dict_diff(upper_bounds, self._cached_upper_bounds)
+             if len(ub_new) > 0:
+-                self.problem.variables.set_upper_bounds(ub_new)
++                self.problem.variables.set_upper_bounds(list(ub_new))
+ 
+         return lb_new, ub_new
+ 

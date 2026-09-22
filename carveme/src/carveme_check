@@ -1,0 +1,85 @@
+#!/bin/bash
+# Proves the image is metaGEM's CarveMe: versions, the bundled DIAMOND database, the scoring path,
+# and metaGEM's carve call end to end on iJO1366's proteins. Needs CPLEX on PYTHONPATH, since
+# `import carveme` selects it at import time.
+set -euo pipefail
+
+WS=$(mktemp -d)
+cd "$WS"
+PD=$(python -c 'import importlib.util, os; print(os.path.dirname(importlib.util.find_spec("carveme").origin) + "/")')
+DB=${PD}data/input/bigg_proteins.dmnd
+
+python - <<'EOF'
+import carveme, framed, pandas, numpy, scipy, sympy, libsbml
+from importlib.metadata import version
+assert carveme.__version__ == "1.2.2", carveme.__version__
+assert version("framed") == "0.5.1", version("framed")
+for m in (pandas, numpy, scipy, sympy):
+    print(f"{m.__name__} {m.__version__}")
+print(f"carveme {carveme.__version__}, framed {version('framed')}, libsbml {libsbml.getLibSBMLDottedVersion()}")
+EOF
+carve --help > /dev/null
+diamond version
+diamond dbinfo -d "$DB"
+
+python - "$PD" <<'EOF'
+import sys
+pd_dir = sys.argv[1]
+n = 0
+with open(pd_dir + "data/input/bigg_proteins.faa") as src, open("query.faa", "w") as dst:
+    keep = False
+    for line in src:
+        if line.startswith(">"):
+            keep = line.startswith(">iJO1366.")
+            n += keep
+        if keep:
+            dst.write(line)
+assert n > 1000, n
+print(f"query: {n} iJO1366 proteins")
+EOF
+
+# run_blast's own call, with its default arguments
+diamond blastp -d "$DB" -q query.faa -o query.tsv --more-sensitive --top 10
+
+python - "$PD" <<'EOF'
+import sys
+import pandas as pd
+from carveme import config
+from carveme.reconstruction.diamond import load_diamond_results
+from carveme.reconstruction.scoring import reaction_scoring
+from framed import load_cbmodel
+
+pd_dir = sys.argv[1]
+annotations = load_diamond_results("query.tsv")
+gene2gene = annotations.sort_values(by="score", ascending=False) \
+                       .groupby("BiGG_gene", as_index=False).apply(lambda x: x.iloc[0])
+assert "BiGG_gene" in gene2gene.columns, list(gene2gene.columns)
+assert gene2gene["BiGG_gene"].is_unique
+assert len(gene2gene) == annotations["BiGG_gene"].nunique()
+
+universe = load_cbmodel(pd_dir + config.get("generated", "default_universe"),
+                        flavor=config.get("sbml", "default_flavor"))
+gprs = pd.read_csv(pd_dir + config.get("generated", "bigg_gprs"))
+gprs = gprs[gprs.reaction.isin(universe.reactions)]
+scores = reaction_scoring(annotations, gprs)
+assert scores is not None and len(scores) > 1000, None if scores is None else len(scores)
+
+print(f"hits {len(annotations)}, genes {len(gene2gene)}, scored reactions {len(scores)}, "
+      f"universe reactions {len(universe.reactions)}")
+EOF
+
+carve --diamond query.tsv -g M8 -v --mediadb /app/metagem_media_db.tsv --fbc2 -o model.xml
+python - <<'EOF'
+from framed import load_cbmodel
+m = load_cbmodel("model.xml", flavor="fbc2")
+genes = {g for r in m.reactions.values() if r.gpr for p in r.gpr.proteins for g in p.genes}
+assert len(m.reactions) > 500 and genes, (len(m.reactions), len(genes))
+# framed drops every note, silently, when it cannot escape one; metaGEM's GEMs carry them all
+xml = open("model.xml").read()
+notes = xml.count("<notes>")
+assert "This model was built with CarveMe version 1.2.2" in xml and notes > len(m.reactions), notes
+print(f"carved: {len(m.reactions)} reactions, {len(m.metabolites)} metabolites, {len(genes)} genes, {notes} notes")
+EOF
+
+rm -rf "$WS"
+echo "carveme_check OK"

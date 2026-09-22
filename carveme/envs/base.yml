@@ -1,0 +1,21 @@
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  # 3.12 because fir's only CPLEX runtime is 22.2.0, built for 3.12 alone (py312_cplex2220.so).
+  - python=3.12
+  - pip
+  # pandas<3: scoring.py's groupby(as_index=False).apply(lambda x: x.iloc[0]) must keep the
+  # grouping column, which pandas 3 drops.
+  - pandas=2.2.3
+  - numpy=1.26.4
+  - scipy=1.13.1
+  - sympy=1.13.3
+  - matplotlib-base=3.9.2
+  - requests=2.32.3
+  # carveme/__init__.py imports future's standard_library but does not declare it.
+  - future=1.0.0
+  # applies patches/ at build time
+  - patch
+  # metaGEM's envs/metaGEM_env.yml asks for diamond>=2.0.6.
+  - diamond=2.1.9
