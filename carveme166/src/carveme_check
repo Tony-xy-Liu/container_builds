@@ -1,0 +1,46 @@
+#!/bin/bash
+# Proves the image is the stock CarveMe 1.6.6 on Python 3.12: versions, the solver reframed picks,
+# the bundled DIAMOND database, and metaGEM's carve call end to end on iML1515's proteins.
+# usage: carveme_check cplex|scip -- the solver reframed must pick. CPLEX is picked only when the
+# cplex runtime is on PYTHONPATH.
+set -euo pipefail
+EXPECT=${1:?usage: carveme_check cplex|scip}
+
+WS=$(mktemp -d)
+cd "$WS"
+PD=$(python -c 'import importlib.util, os; print(os.path.dirname(importlib.util.find_spec("carveme").origin) + "/")')
+
+python - "$EXPECT" <<'EOF'
+import sys
+import carveme, reframed, pandas, numpy, scipy, sympy, libsbml, pyscipopt
+from importlib.metadata import version
+from reframed.solvers import get_default_solver
+assert sys.version_info[:2] == (3, 12), sys.version
+assert carveme.__version__ == "1.6.6", carveme.__version__
+assert version("reframed") == "1.6.0", version("reframed")
+for m in (pandas, numpy, scipy, sympy, pyscipopt):
+    print(f"{m.__name__} {m.__version__}")
+print(f"python {sys.version.split()[0]}, carveme {carveme.__version__}, reframed {version('reframed')}, "
+      f"libsbml {libsbml.getLibSBMLDottedVersion()}")
+solver = get_default_solver()
+print(f"solver {solver}")
+assert solver == sys.argv[1], solver
+EOF
+carve --help > /dev/null
+diamond version
+diamond dbinfo -d "${PD}data/generated/bigg_proteins.dmnd"
+echo "gpr rows $(zcat "${PD}data/generated/bigg_gprs.csv.gz" | tail -n +2 | wc -l)"
+
+awk '/^>/{keep = /^>iML1515\./} keep' "${PD}data/generated/bigg_proteins.faa" > query.faa
+echo "query: $(grep -c '^>' query.faa) iML1515 proteins"
+
+carve query.faa -g M8 -v --mediadb /app/metagem_media_db.tsv --fbc2 -o model.xml
+python - <<'EOF'
+from reframed import load_cbmodel
+m = load_cbmodel("model.xml", flavor="fbc2")
+genes = {g for r in m.reactions.values() if r.gpr for p in r.gpr.proteins for g in p.genes}
+assert len(m.reactions) > 500 and genes, (len(m.reactions), len(genes))
+assert "CarveMe version 1.6.6" in open("model.xml").read()
+print(f"model: {len(m.reactions)} reactions, {len(m.metabolites)} metabolites, {len(genes)} genes")
+EOF
+echo "carveme_check $EXPECT: ok"

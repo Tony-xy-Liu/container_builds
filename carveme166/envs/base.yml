@@ -1,0 +1,18 @@
+channels:
+  - conda-forge
+  - bioconda
+# The stock quay.io/biocontainers/carveme:1.6.6--pyhdfd78af_1 pins, on Python 3.12 instead of 3.14.
+dependencies:
+  # 3.12 because fir's only CPLEX runtime is 22.2.0, built for 3.12 alone (py312_cplex2220.so).
+  - python=3.12
+  - carveme=1.6.6
+  - reframed=1.6.0
+  - scip=9.2.4
+  - pyscipopt=5.6.0
+  - numpy=2.3.5
+  - pandas=2.3.3
+  - scipy=1.16.3
+  - sympy=1.14.0
+  - python-libsbml=5.20.5
+  - requests=2.32.5
+  - diamond=2.1.13
